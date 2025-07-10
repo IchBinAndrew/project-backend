@@ -2,14 +2,14 @@ from fastapi import FastAPI
 # from faststream import FastStream, Context
 # from faststream.kafka import KafkaBroker
 from aiokafka import AIOKafkaConsumer
+from aiokafka.structs import TopicPartition
 from typing import Any
+from contextlib import asynccontextmanager
 import uvicorn
 import asyncio
 
 # broker = KafkaBroker(bootstrap_servers="kafka:9092")
 # stream = FastStream(broker=broker)
-
-app = FastAPI()
 
 # @broker.subscriber("tasks")
 # async def process_task(msg: str, message=Context()):
@@ -32,12 +32,18 @@ async def get_consumer():
 
 # @app.on_event("startup")
 # async def startup_event():
-#     asyncio.create_task(process_messages())  # Run in background
+#     print("Trying to create kafka consumer task")
+#     try:
+#         await get_consumer()
+#         asyncio.create_task(process_messages())  # Run in background
+#     except Exception as e:
+#         print(f"Error when trying to initialize task: {e}")
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    if consumer:
-        await consumer.stop()
+
+# @app.on_event("shutdown")
+# async def shutdown_event():
+#     if consumer:
+#         await consumer.stop()
 
 # @app.on_event("startup")
 # async def startup():
@@ -52,7 +58,8 @@ async def has_messages(timeout: float = 0.01) -> bool:
         consumer = await get_consumer()
         msg = await asyncio.wait_for(consumer.getone(), timeout=timeout)
         # Put the message back in the queue (seek to previous offset)
-        await consumer.seek(msg.topic, msg.partition, msg.offset)
+        tp = TopicPartition(msg.topic, msg.partition)
+        await consumer.seek(tp, msg.offset)
         return True
     except (asyncio.TimeoutError, StopAsyncIteration):
         return False
@@ -67,6 +74,20 @@ async def process_messages():
     except Exception as e:
         print(f"Consumer error: {e}")
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Trying to create kafka consumer task")
+    try:
+        await get_consumer()
+        asyncio.create_task(process_messages())  # Run in background
+    except Exception as e:
+        print(f"Error when trying to initialize task: {e}")
+    yield
+    if consumer:
+        await consumer.stop()
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 async def test():
