@@ -32,12 +32,11 @@ async def get_consumer():
 
 # @app.on_event("startup")
 # async def startup_event():
-#     print("Trying to create kafka consumer task")
+#     print("Trying to create kafka consumer")
 #     try:
 #         await get_consumer()
-#         asyncio.create_task(process_messages())  # Run in background
 #     except Exception as e:
-#         print(f"Error when trying to initialize task: {e}")
+#         print(f"Error when trying to initialize consumer: {e}")
 
 
 # @app.on_event("shutdown")
@@ -59,7 +58,7 @@ async def has_messages(timeout: float = 0.01) -> bool:
         msg = await asyncio.wait_for(consumer.getone(), timeout=timeout)
         # Put the message back in the queue (seek to previous offset)
         tp = TopicPartition(msg.topic, msg.partition)
-        await consumer.seek(tp, msg.offset)
+        consumer.seek(tp, msg.offset)
         return True
     except (asyncio.TimeoutError, StopAsyncIteration):
         return False

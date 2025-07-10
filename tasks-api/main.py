@@ -5,11 +5,11 @@ from assign_router import router as assign_router
 from faststream.kafka import KafkaBroker
 import uvicorn
 
-broker = KafkaBroker(bootstrap_servers="localhost:9092")
+# broker = KafkaBroker(bootstrap_servers="localhost:9092")
 
-@broker.subscriber("completed-tasks")
-async def complete_task(msg: str):
-    print(f"Recieved completed task: {msg}")
+# @broker.subscriber("completed-tasks")
+# async def complete_task(msg: str):
+#     print(f"Recieved completed task: {msg}")
 
 app = FastAPI()
 app.include_router(uploads, prefix="/task")
