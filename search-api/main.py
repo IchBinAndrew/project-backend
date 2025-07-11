@@ -79,7 +79,7 @@ async def lifespan(app: FastAPI):
     print("Trying to create kafka consumer task")
     try:
         await get_consumer()
-        asyncio.create_task(process_messages())  # Run in background
+        # asyncio.create_task(process_messages())  # Run in background
     except Exception as e:
         print(f"Error when trying to initialize task: {e}")
     yield

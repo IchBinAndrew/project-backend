@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional, Any, Annotated, Union
 from database.enums import TaskCategoryEnum
 from database.controller import create_task
-from database.pydantic_schemes import TaskModel
+from database.pydantic_schemes import TaskModel, TaskKafkaModel
 import httpx
 import json
 # from faststream import FastStream, Context
@@ -107,8 +107,10 @@ async def upload_task_with_image(task: TaskRequestModel = Depends(get_task_data)
                      data_json=task.data_json,
                      user_id=task.assigned_user_id,
                      file_key_1=file_key_1, file_key_2=file_key_2 if file_key_2 else None)
-    message = TaskModel.model_validate(new_task).model_dump_json()
-    await publish_to_tasks(message=message)
+    task_to_send = TaskKafkaModel.model_validate(new_task)
+    if task_to_send.assigned_user_id:
+        message = task_to_send.model_dump_json()
+        await publish_to_tasks(message=message)
     return "OK"
 
 
@@ -121,8 +123,10 @@ async def upload_task_with_text(task: TaskRequestModel = Depends(get_task_data),
     new_task = await create_task(task_category=task.category,
                      data_json=task.data_json,
                      user_id=task.assigned_user_id)
-    message = TaskModel.model_validate(new_task).model_dump_json()
-    await publish_to_tasks(message=message)
+    task_to_send = TaskKafkaModel.model_validate(new_task)
+    if task_to_send.assigned_user_id:
+        message = task_to_send.model_dump_json()
+        await publish_to_tasks(message=message)
     return "OK"
 
 
