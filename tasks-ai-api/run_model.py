@@ -39,7 +39,7 @@ def extract_features(row):
     cpu_gen = 0
     try:
         cpu_gen = int(re.findall(r"\d{4,5}", cpu_text)[0])
-    except:
+    except Exception:
         pass
 
     cpu_perf = cpu_performance_score(cpu_text)
@@ -47,13 +47,13 @@ def extract_features(row):
     ram_num = 0
     try:
         ram_num = int(re.findall(r"\d+", data[3])[0])
-    except:
+    except Exception:
         pass
 
     storage_num = 0
     try:
         storage_num = int(re.findall(r"\d+", data[4])[0])
-    except:
+    except Exception:
         pass
 
     gpu_power = gpu_performance_score(data[5].lower())
