@@ -8,6 +8,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 import asyncio
 
+from list_router import router as list_router
+
 # broker = KafkaBroker(bootstrap_servers="kafka:9092")
 # stream = FastStream(broker=broker)
 
@@ -87,9 +89,10 @@ async def lifespan(app: FastAPI):
         await consumer.stop()
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(list_router)
 
-@app.get("/")
-async def test():
+@app.get("/notifications")
+async def test(user_id: int):
     await process_messages()
     return {"status": "healthy"}
 

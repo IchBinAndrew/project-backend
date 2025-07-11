@@ -8,9 +8,8 @@ router = APIRouter()
 
 
 @router.get("/list")
-async def list_tasks(id: int | None = None, limit: int | None = None, offset: int = 0,
-                     user_role = Depends(user_role)):
-    if user_role != "ROLE_USER":
-        raise HTTPException(status_code=403, detail="Forbidden.")
+async def list_tasks(id: int | None = None, limit: int | None = None, offset: int = 0,):
+    # if user_role != "ROLE_USER":
+    #     raise HTTPException(status_code=403, detail="Forbidden.")
     tasks = await get_tasks(task_id=id, limit=limit, offset=offset)
     return tasks
