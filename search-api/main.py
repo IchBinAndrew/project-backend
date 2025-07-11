@@ -78,7 +78,7 @@ async def process_messages():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Trying to create kafka consumer task")
+    print("Trying to create kafka consumer")
     try:
         await get_consumer()
         # asyncio.create_task(process_messages())  # Run in background
