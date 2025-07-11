@@ -9,6 +9,7 @@ import json
 # from faststream import FastStream, Context
 # from faststream.kafka import KafkaBroker
 from aiokafka import AIOKafkaProducer
+from deps import user_role
 
 
 URL = "http://upload-api:5050"
@@ -75,7 +76,11 @@ async def get_task_data(task: str = Form(...)):
 
 @router.post("/image")
 async def upload_task_with_image(task: TaskRequestModel = Depends(get_task_data), file: UploadFile = File(...),
-                                second_file: Annotated[Union[UploadFile, None], File()] = None):
+                                second_file: Annotated[Union[UploadFile, None], File()] = None,
+                                user_role: str = Depends(user_role)):
+    print(user_role)
+    if user_role != "ROLE_ADMIN":
+        raise HTTPException(status_code=401, detail="Not authorized.")
     upload_url = f"{URL}/upload/images"
     file_bytes = await file.read()
     file_key_2 = None
@@ -108,7 +113,11 @@ async def upload_task_with_image(task: TaskRequestModel = Depends(get_task_data)
 
 
 @router.post("/text")
-async def upload_task_with_text(task: TaskRequestModel = Depends(get_task_data)):
+async def upload_task_with_text(task: TaskRequestModel = Depends(get_task_data),
+                                user_role: str = Depends(user_role)):
+    print(user_role)
+    if user_role != "ROLE_ADMIN":
+        raise HTTPException(status_code=401, detail="Not authorized.")
     new_task = await create_task(task_category=task.category,
                      data_json=task.data_json,
                      user_id=task.assigned_user_id)
