@@ -8,13 +8,15 @@ AUTH_URL = "http://89.169.146.136:8765/users"
 
 async def user_role(request: Request, authorization: str | None = Header(None)):
     token = request.cookies.get("token")
+    if token:
+        pass
     if not token and authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ")[1]
     elif token is None:
         print("Token is None!")
         print(request.headers)
         print(authorization)
-        print(authorization.split(" "))
+        # print(authorization.split(" "))
         raise HTTPException(status_code=401, detail="Not authenticated.")
     header = jwt.get_unverified_header(token)
     algorithm = header.get("alg")

@@ -80,7 +80,7 @@ async def upload_task_with_image(task: TaskRequestModel = Depends(get_task_data)
                                 user_role: str = Depends(user_role)):
     print(user_role)
     if user_role != "ROLE_ADMIN":
-        raise HTTPException(status_code=401, detail="Not authorized.")
+        raise HTTPException(status_code=403, detail="Forbidden.")
     upload_url = f"{URL}/upload/images"
     file_bytes = await file.read()
     file_key_2 = None
@@ -117,7 +117,7 @@ async def upload_task_with_text(task: TaskRequestModel = Depends(get_task_data),
                                 user_role: str = Depends(user_role)):
     print(user_role)
     if user_role != "ROLE_ADMIN":
-        raise HTTPException(status_code=401, detail="Not authorized.")
+        raise HTTPException(status_code=403, detail="Forbidden.")
     new_task = await create_task(task_category=task.category,
                      data_json=task.data_json,
                      user_id=task.assigned_user_id)
