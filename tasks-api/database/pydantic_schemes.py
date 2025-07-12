@@ -24,6 +24,8 @@ class TaskFilterModel(BaseModel):
     category: Optional[TaskCategoryEnum] = None
     data_json: Optional[dict[str, Any]] = None
 
+    ai_pred: Optional[str] = None
+
     file_key_1: Optional[str] = None
     file_key_2: Optional[str] = None
 

@@ -71,7 +71,7 @@ async def predict_laptop_relevancy(task_id: int, data: TaskMultifactorRelevancyD
         # 3. Publish result async (non-blocking)
     await producer.send(
         'ai_predictions',
-        value=PredictionModel(task_id=task_id, prediction=prediction).model_dump_json().encode()
+        value=PredictionModel(task_id=task_id, prediction=prediction).model_dump_json().encode('utf-8')
     )
 
 

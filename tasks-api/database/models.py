@@ -7,7 +7,7 @@ from database.enums import TaskCategoryEnum
 
 DB_USER = "testuser"
 DB_PASSWORD = "passwd123!"
-DB_HOST = "127.0.0.1"
+DB_HOST = "postgres"
 DB_PORT = 5432
 DB_NAME = "mydb"
 
