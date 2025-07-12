@@ -20,6 +20,17 @@ services:
     networks:
       - dev
       - kafka-net
+    
+  tasks-ai-api:
+    build: tasks-ai-api/
+    ports:
+      - "7070:7070"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - dev
+      - kafka-net
 
   upload-api:
     build: s3-storage/

@@ -13,6 +13,7 @@ from deps import user_role
 
 
 URL = "http://upload-api:5050"
+AI_URL = "http://tasks-ai-api:6000"
 
 router = APIRouter(prefix="/upload")
 
@@ -124,9 +125,12 @@ async def upload_task_with_text(task: TaskRequestModel = Depends(get_task_data),
                      data_json=task.data_json,
                      user_id=task.assigned_user_id)
     task_to_send = TaskKafkaModel.model_validate(new_task)
+    task_send_to_ai = TaskModel.model_validate(new_task)
     if task_to_send.assigned_user_id:
         message = task_to_send.model_dump_json()
         await publish_to_tasks(message=message)
+    async with httpx.AsyncClient() as client:
+        await client.get(f"{AI_URL}/pred", data=task_send_to_ai.model_dump())
     return "OK"
 
 

@@ -8,6 +8,7 @@ from pydantic_models import TaskMultifactorRelevancyDataModel
 from functools import partial
 from launch_laptop_recommendation import predict_from_input as laptop_recommendation
 import asyncio
+import uvicorn
 
 
 class TaskModel(BaseModel):
@@ -55,30 +56,35 @@ async def lifespan(app: FastAPI):
 
 async def predict_laptop_relevancy(task_id: int, data: TaskMultifactorRelevancyDataModel):
     producer = await get_producer()
-    prediction =  await asyncio.get_event_loop().run_in_executor(
+    prediction = await asyncio.get_event_loop().run_in_executor(
         None,  # Uses default ThreadPoolExecutor
-        partial(laptop_recommendation(
+        partial(laptop_recommendation,
             data.query,
             data.title,
             data.cpu,
             data.ram,
             data.storage,
             data.gpu
-        ))  # Partial binds args
+        )  # Partial binds args
     )
-        
+    print(prediction)
         # 3. Publish result async (non-blocking)
     await producer.send(
-        'results_topic',
-        value=PredictionModel(task_id=task_id, prediction=prediction)
+        'ai_predictions',
+        value=PredictionModel(task_id=task_id, prediction=prediction).model_dump_json().encode()
     )
 
 
 app = FastAPI()
 
-@app.get("/pred")
+@app.post("/pred")
 async def get_prediction(task: TaskModel):
     if task.category == TaskCategoryEnum.MULTIFACTOR_RELEVANCY:
-        data = TaskMultifactorRelevancyDataModel.model_validate_json(task.data_json)
-        asyncio.create_task(partial(predict_laptop_relevancy, task_id=task.id, data=data))
+        data = TaskMultifactorRelevancyDataModel.model_validate(task.data_json)
+        coro = predict_laptop_relevancy(task_id=task.id, data=data)
+        asyncio.create_task(coro)
     return "OK"
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=7070)
