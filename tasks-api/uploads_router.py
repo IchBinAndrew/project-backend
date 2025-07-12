@@ -6,9 +6,10 @@ from database.controller import create_task
 from database.pydantic_schemes import TaskModel, TaskKafkaModel
 import httpx
 import json
+import asyncio
 # from faststream import FastStream, Context
 # from faststream.kafka import KafkaBroker
-from aiokafka import AIOKafkaProducer
+from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 from deps import user_role
 
 
@@ -26,9 +27,29 @@ async def get_producer():
         await producer.start()
     return producer
 
+
+async def consume_messages():
+    print("Trying to initialize consumer")
+    consumer = AIOKafkaConsumer(
+        "ai_predictions",
+        bootstrap_servers="kafka:9092",
+        group_id='ai-predictions-processor'
+    )
+    await consumer.start()
+    print("Started consuming")
+    try:
+        async for msg in consumer:
+            print(f"Consumed prediction: {msg.value}")
+            raise Exception()
+    finally:
+        print("Shutting consumer down")
+        await consumer.stop()
+
+
 @router.on_event("startup")
 async def startup_event():
     await get_producer()  # Initialize producer on startup
+    asyncio.create_task(consume_messages())
 
 @router.on_event("shutdown")
 async def shutdown_event():
@@ -44,6 +65,7 @@ async def publish_to_tasks(message: str):
     except Exception as e:
         print(f"❌ Publish failed: {e}")
         raise HTTPException(500, "Message publishing failed")
+
 
 # broker = KafkaBroker(bootstrap_servers="kafka:9092")
 # stream = FastStream(broker=broker)

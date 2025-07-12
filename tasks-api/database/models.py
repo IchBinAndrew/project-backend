@@ -7,7 +7,7 @@ from database.enums import TaskCategoryEnum
 
 DB_USER = "testuser"
 DB_PASSWORD = "passwd123!"
-DB_HOST = "postgres"
+DB_HOST = "127.0.0.1"
 DB_PORT = 5432
 DB_NAME = "mydb"
 
@@ -32,6 +32,8 @@ class Task(Base):
     assigned_user_id: Mapped[Optional[int]]
     category: Mapped[TaskCategoryEnum]
     data_json: Mapped[dict[str, Any]] = mapped_column(JSON)
+
+    ai_pred: Mapped[Optional[str]]
 
     file_key_1: Mapped[Optional[str]]
     file_key_2: Mapped[Optional[str]]

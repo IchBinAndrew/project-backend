@@ -10,6 +10,8 @@ class TaskModel(BaseModel):
     category: TaskCategoryEnum
     data_json: dict[str, Any]
 
+    ai_pred: Optional[str] = None
+
     file_key_1: Optional[str]
     file_key_2: Optional[str]
 
