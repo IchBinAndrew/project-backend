@@ -10,3 +10,19 @@ class TaskMultifactorRelevancyDataModel(BaseModel):
     gpu: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class TaskCommentAttitudeDataModel(BaseModel):
+    comment: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+class TaskStatementsLogicalConnectionDataModel(BaseModel):
+    statement1: str
+    statement2: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+class TaskGenreAndStyleDefinitionDataModel(BaseModel):
+    text: str
+
+    model_config = ConfigDict(from_attributes=True)

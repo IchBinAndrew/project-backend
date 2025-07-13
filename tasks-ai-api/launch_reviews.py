@@ -1,5 +1,6 @@
 import joblib
 clf = joblib.load("logreg_sentiment_model.joblib")
+vectorizer = joblib.load("tfidf_vectorizer_to_launch.joblib")
 labels_map = {
     0: "🌞",
     1: "😐",
@@ -12,4 +13,4 @@ def predict_sentiment(text):
     pred = clf.predict(vec)[0]
     return labels_map[pred]
 
-print(predict_sentiment("телефон ужасный"))
+# print(predict_sentiment("телефон ужасный"))

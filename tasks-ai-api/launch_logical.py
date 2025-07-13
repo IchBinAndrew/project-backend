@@ -8,6 +8,6 @@ def predict_relation(first_fact, second_fact):
     prediction = model.predict(vec)[0]
     return prediction
 #--------
-print(predict_relation(
-    "ел раков",
-    "выпал снег"))
+# print(predict_relation(
+#     "ел раков",
+#     "выпал снег"))
